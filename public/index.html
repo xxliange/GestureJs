@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="div"></div>
+</body>
+</html>
+
+<script src="./../build/gesture.min.js"></script>
+<script>
+    var el = document.getElementById('div');
+    new GestureJs(el).on('touch', function(){
+        console.log('in');
+    }).on('longtap', function(){
+        console.log('longtap');
+    })
+</script>
