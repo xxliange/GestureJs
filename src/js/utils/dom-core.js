@@ -1,3 +1,4 @@
+import HanderAdmin from './../core/handerAdmin';
 // 创建对象
 class DomElement {
     constructor(selector){
@@ -10,6 +11,11 @@ class DomElement {
             obj = obj.parentNode;
         }
         return null;
+    }
+    wrapFunc(el, handler){
+        const handlerAdmin = new HanderAdmin(el);
+        handlerAdmin.add(handler);
+        return handlerAdmin;
     }
 }
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
@@ -14,9 +14,35 @@
 <script src="./../build/gesture.min.js"></script>
 <script>
     var el = document.getElementById('div');
-    new GestureJs(el).on('touch', function(){
-        console.log('in');
-    }).on('longtap', function(){
-        console.log('longtap');
+    let x = 0,
+        y = 0;
+    new GestureJs(el, {
+        singleTap:function(){
+            console.log('singleTap');
+        },
+        longTap:function(){
+            console.log('longTap');
+        },
+        doubleTap:function(e){
+            console.log('doubleTap');
+        },
+        pressMove:function(e){
+            y += e.deltaY;
+            x += e.deltaX;
+            el.style.transform = `translate(${x}px, ${y}px)`;
+            e.preventDefault();
+        },
+        pressDown:function(){
+            console.log('down');
+        },
+        pressUp:function(){
+            console.log('up');
+        },
+        pressLeft:function(){
+            console.log('left');
+        },
+        pressRight:function(){
+            console.log('right');
+        }
     })
 </script>
