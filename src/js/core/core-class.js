@@ -6,7 +6,6 @@ class Gesture{
         if(!this.target) {
             throw new Error('请绑定元素!');
         };
-        this._init();
         this._touch = this._touch.bind(this);
         this._move = this._move.bind(this);
         this._end = this._end.bind(this);
@@ -18,6 +17,7 @@ class Gesture{
 
         this.preV = {x:null, y:null};
         this.isDoubleTap = false;
+        this.isLongTap = false;
 
         this.params = {};
         this.touch = {
@@ -25,6 +25,7 @@ class Gesture{
             startY:null,
             moveX:null,
             moveY:null,
+            diffX:null,
             startTime:null,
             deltaTime:null,
             lastTime:null,
@@ -98,9 +99,11 @@ class Gesture{
         this._preventTap = false;
 
         // 长按逻辑
+        this.isLongTap = false;
         this.longTapTimeout = setTimeout(() => {
             this.longTap.dispatch(e, this.target);
             this._preventTap = true;
+            this.isLongTap = true;
         }, 750);
     }
 
@@ -114,7 +117,7 @@ class Gesture{
         if(this.touch.moveX !== null){
             e.deltaX = currentX - this.touch.moveX;
             e.deltaY = currentY - this.touch.moveY;
-
+            this.touch.diffX = e.deltaX;
             const movedX = Math.abs(this.touch.startX - this.touch.moveX),
                 movedY = Math.abs(this.touch.startY - this.touch.moveY);
                 if(movedX > 10 || movedY > 10){
@@ -137,6 +140,7 @@ class Gesture{
     }
 
     _end(e){
+        e.preventDefault();
         if(!e.changedTouches) return;
         this._cancelLongTap();
         // 多指操作
@@ -156,11 +160,14 @@ class Gesture{
                     this.pressDown.dispatch(e, this.target);
                 }
             }else{
+                const {diffX} = this.touch;
+                e.diffX = diffX;
                 if(deltaX < 0){
                     this.pressLeft.dispatch(e, this.target);
                 }else{
                     this.pressRight.dispatch(e, this.target);
                 }
+                
             }
         }else{
             // 如果移动的距离没有超过30 则判断是单击 双击
@@ -176,7 +183,7 @@ class Gesture{
                 }
             }, 0);
     
-            if(!this.isDoubleTap){
+            if(!this.isDoubleTap && !this.isLongTap){
                 this.singleTapTimeout = setTimeout(() => {
                     this.singleTap.dispatch(e, this.target);
                 }, 250);
@@ -203,10 +210,6 @@ class Gesture{
     }
 
 
-    _cancel(){
-        console.log('cancle')
-    }
-
     _emit(type, e){
         !this.handles[type] && (this.handles[type] = []);
         const currentTarget = $().isTarget(this.e, this.selector);
@@ -231,6 +234,18 @@ class Gesture{
         this.touch = {};
         this.movetouch = {};
         this.params = {zoom:1, deltaX:0, deltaY:0, diffX:0, diffY:0, angle:0, direction:''};
+    }
+
+    cancelAll(){
+        this._preventTap = true;
+        clearTimeout(this.singleTapTimeout);
+        clearTimeout(this.longTapTimeout);
+        clearTimeout(this.tapTimeout);
+    }
+
+    _cancel(e){
+        this.cancelAll();
+        this.touchCancel.dispatch(e, this.target);
     }
 
     destroy(){

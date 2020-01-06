@@ -1,13 +1,23 @@
 {
-  "name": "gesturejs",
-  "version": "1.0.0",
+  "name": "lg_gesturejs",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "build/gesture.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://github.com/xxliange/GestureJs",
   "author": "liange",
   "license": "ISC",
+  "engines": {
+    "node": ">= 4.7.0"
+  },
+  "browserslist": [
+    "Android > 4",
+    "IOS >= 7",
+    "last 4 versions",
+    "ie >= 10"
+  ],
   "devDependencies": {
     "autoprefixer": "^9.7.3",
     "babel-plugin-external-helpers": "^6.22.0",

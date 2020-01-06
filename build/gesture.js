@@ -108,8 +108,7 @@
           this.target = target instanceof HTMLElement ? target : typeof target === 'string' ? document.querySelector(target) : null;
           if (!this.target) {
               throw new Error('请绑定元素!');
-          }        this._init();
-          this._touch = this._touch.bind(this);
+          }        this._touch = this._touch.bind(this);
           this._move = this._move.bind(this);
           this._end = this._end.bind(this);
           this._cancel = this._cancel.bind(this);
@@ -120,6 +119,7 @@
 
           this.preV = { x: null, y: null };
           this.isDoubleTap = false;
+          this.isLongTap = false;
 
           this.params = {};
           this.touch = {
@@ -127,6 +127,7 @@
               startY: null,
               moveX: null,
               moveY: null,
+              diffX: null,
               startTime: null,
               deltaTime: null,
               lastTime: null
@@ -204,9 +205,11 @@
               this._preventTap = false;
 
               // 长按逻辑
+              this.isLongTap = false;
               this.longTapTimeout = setTimeout(function () {
                   _this.longTap.dispatch(e, _this.target);
                   _this._preventTap = true;
+                  _this.isLongTap = true;
               }, 750);
           }
       }, {
@@ -221,7 +224,7 @@
               if (this.touch.moveX !== null) {
                   e.deltaX = currentX - this.touch.moveX;
                   e.deltaY = currentY - this.touch.moveY;
-
+                  this.touch.diffX = e.deltaX;
                   var movedX = Math.abs(this.touch.startX - this.touch.moveX),
                       movedY = Math.abs(this.touch.startY - this.touch.moveY);
                   if (movedX > 10 || movedY > 10) {
@@ -247,6 +250,7 @@
           value: function _end(e) {
               var _this2 = this;
 
+              e.preventDefault();
               if (!e.changedTouches) return;
               this._cancelLongTap();
               // 多指操作
@@ -265,6 +269,9 @@
                           this.pressDown.dispatch(e, this.target);
                       }
                   } else {
+                      var diffX = this.touch.diffX;
+
+                      e.diffX = diffX;
                       if (deltaX < 0) {
                           this.pressLeft.dispatch(e, this.target);
                       } else {
@@ -285,7 +292,7 @@
                       }
                   }, 0);
 
-                  if (!this.isDoubleTap) {
+                  if (!this.isDoubleTap && !this.isLongTap) {
                       this.singleTapTimeout = setTimeout(function () {
                           _this2.singleTap.dispatch(e, _this2.target);
                       }, 250);
@@ -309,11 +316,6 @@
           key: '_cancelSingleTap',
           value: function _cancelSingleTap() {
               clearTimeout(this.singleTapTimeout);
-          }
-      }, {
-          key: '_cancel',
-          value: function _cancel() {
-              console.log('cancle');
           }
       }, {
           key: '_emit',
@@ -342,6 +344,20 @@
               this.touch = {};
               this.movetouch = {};
               this.params = { zoom: 1, deltaX: 0, deltaY: 0, diffX: 0, diffY: 0, angle: 0, direction: '' };
+          }
+      }, {
+          key: 'cancelAll',
+          value: function cancelAll() {
+              this._preventTap = true;
+              clearTimeout(this.singleTapTimeout);
+              clearTimeout(this.longTapTimeout);
+              clearTimeout(this.tapTimeout);
+          }
+      }, {
+          key: '_cancel',
+          value: function _cancel(e) {
+              this.cancelAll();
+              this.touchCancel.dispatch(e, this.target);
           }
       }, {
           key: 'destroy',
@@ -377,7 +393,7 @@
       throw new Error('请在浏览器环境下运行');
   }
 
-  var inlinecss = 'body{    width: 100%;    height: 100vh;    background: #f7c695;}div{    width: 100px;    height: 100px;    border-radius: 100%;    background: #fff;}';
+  var inlinecss = 'body{    margin: 0;    padding: 0;}li{    list-style: none;}.gestureDom_wrap{    width: 100px;    height: 100px;    background: #f7c695;    border-radius: 100%;}.gestureDom_info{    width: 100%;    text-align: center;    position: fixed;    padding: 20px 0px;    bottom: 10vh;    font-size: 40px;    font-weight: 600;    color: #000;}.gestureDom_listWrap{    width: 100%;    height: 100px;    position: relative;    overflow: hidden;}.gestureDom_listMain{    height: 100%;    position: absolute;    top: 0;    left: 0;    display: -webkit-box;    display: -webkit-flex;    display: -ms-flexbox;    display: flex;    white-space: nowrap;}.gestureDom_listItem{    width: 100px;    margin-right: 10px;    background: #f7c695;    display: -webkit-box;    display: -webkit-flex;    display: -ms-flexbox;    display: flex;    -webkit-box-align: center;    -webkit-align-items: center;        -ms-flex-align: center;            align-items: center;    -webkit-box-pack: center;    -webkit-justify-content: center;        -ms-flex-pack: center;            justify-content: center;}';
   var style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = inlinecss;

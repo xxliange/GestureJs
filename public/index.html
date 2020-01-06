@@ -7,42 +7,129 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="div"></div>
+    <!-- <div id="div" class="gestureDom_wrap"></div>
+    <span id='info' class="gestureDom_info">GestureJs</span> -->
+
+    <section class="gestureDom_listWrap">
+        <ul id="gestureDomList" class="gestureDom_listMain">
+            <li class="gestureDom_listItem">1</li>
+            <li class="gestureDom_listItem">2</li>
+            <li class="gestureDom_listItem">3</li>
+            <li class="gestureDom_listItem">4</li>
+            <li class="gestureDom_listItem">5</li>
+            <li class="gestureDom_listItem">6</li>
+            <li class="gestureDom_listItem">7</li>
+            <li class="gestureDom_listItem">8</li>
+            <li class="gestureDom_listItem">9</li>
+            <li class="gestureDom_listItem">10</li>
+            <li class="gestureDom_listItem">11</li>
+            <li class="gestureDom_listItem">12</li>
+            <li class="gestureDom_listItem">13</li>
+            <li class="gestureDom_listItem">14</li>
+            <li class="gestureDom_listItem">15</li>
+            <li class="gestureDom_listItem">16</li>
+            <li class="gestureDom_listItem">17</li>
+            <li class="gestureDom_listItem">18</li>
+            <li class="gestureDom_listItem">19</li>
+            <li class="gestureDom_listItem">20</li>
+            <li class="gestureDom_listItem">21</li>
+            <li class="gestureDom_listItem">22</li>
+            <li class="gestureDom_listItem">23</li>
+            <li class="gestureDom_listItem">24</li>
+            <li class="gestureDom_listItem">25</li>
+            <li class="gestureDom_listItem">26</li>
+            <li class="gestureDom_listItem">27</li>
+            <li class="gestureDom_listItem">28</li>
+            <li class="gestureDom_listItem">29</li>
+            <li class="gestureDom_listItem">30</li>
+            <li class="gestureDom_listItem">31</li>
+            <li class="gestureDom_listItem">32</li>
+            <li class="gestureDom_listItem">33</li>
+            <li class="gestureDom_listItem">34</li>
+        </ul>
+    </section>
 </body>
 </html>
 
 <script src="./../build/gesture.min.js"></script>
 <script>
-    var el = document.getElementById('div');
-    let x = 0,
-        y = 0;
+    // var el = document.getElementById('div'),
+    //     info = document.getElementById('info');
+    // let x = 0,
+    //     y = 0;
+    // new GestureJs(el, {
+    //     singleTap:function(){
+    //         console.log('singleTap');
+    //         info.innerHTML = '单击';
+    //     },
+    //     longTap:function(){
+    //         console.log('longTap');
+    //         info.innerHTML = '长按';
+    //     },
+    //     doubleTap:function(e){
+    //         console.log('doubleTap');
+    //         info.innerHTML = '双击';
+    //     },
+    //     pressMove:function(e){
+    //         y += e.deltaY;
+    //         x += e.deltaX;
+    //         el.style.transform = `translate(${x}px, ${y}px)`;
+    //         e.preventDefault();
+    //         info.innerHTML = '滑动';
+    //     },
+    //     pressDown:function(){
+    //         console.log('down');
+    //         info.innerHTML = '下滑';
+    //     },
+    //     pressUp:function(){
+    //         console.log('up');
+    //         info.innerHTML = '上滑';
+    //     },
+    //     pressLeft:function(){
+    //         console.log('left');
+    //         info.innerHTML = '左滑';
+    //     },
+    //     pressRight:function(){
+    //         console.log('right');
+    //         info.innerHTML = '右滑';
+    //     }
+    // })
+
+    var el = document.getElementById('gestureDomList'),
+        left = 0,
+        width = el.offsetWidth;
     new GestureJs(el, {
-        singleTap:function(){
-            console.log('singleTap');
+        pressMove:(e)=>{
+            const {deltaX} = e;
+            if(parseInt(left) > 0){
+                return;
+            }else{
+                left += deltaX;
+                el.style.left = left+'px';
+            }
         },
-        longTap:function(){
-            console.log('longTap');
+        pressLeft:(e)=>{
+            let {diffX} = e;
+            const diffInterval =  setInterval(() => {
+                diffX = diffX + 1;
+                left += diffX;
+                el.style.left = left+'px';
+                if(diffX > 0 || left < -width){
+                    clearInterval(diffInterval);
+                }
+            }, 10);
         },
-        doubleTap:function(e){
-            console.log('doubleTap');
-        },
-        pressMove:function(e){
-            y += e.deltaY;
-            x += e.deltaX;
-            el.style.transform = `translate(${x}px, ${y}px)`;
-            e.preventDefault();
-        },
-        pressDown:function(){
-            console.log('down');
-        },
-        pressUp:function(){
-            console.log('up');
-        },
-        pressLeft:function(){
-            console.log('left');
-        },
-        pressRight:function(){
-            console.log('right');
+        pressRight:(e)=>{
+            let {diffX} = e;
+            const diffInterval =  setInterval(() => {
+                diffX = diffX - 1;
+                left += diffX;
+                el.style.left = left+'px';
+                if(diffX < 0 || left > 0){
+                    clearInterval(diffInterval);
+                    return false;
+                }
+            }, 10);
         }
     })
 </script>
